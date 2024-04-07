@@ -1,0 +1,44 @@
+version: '3'
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: ./application/nginx/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - fastapi
+    volumes:
+      - media:/usr/share/nginx/html/images/saved_photos
+  fastapi:
+    build: ./application/
+    command: uvicorn application.main:app --host 0.0.0.0
+    expose:
+      - "8000"
+    depends_on:
+      - db
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./application/alembic/versions:/application/alembic/versions
+      - ./application/logs:/application/logs/
+      - media:/saved_photos/
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db_data/:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: twitter_clone_db
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      LOG_DESTINATION: stderr
+      LOGGING_COLLECTOR: "true"
+      LOG_DIRECTORY: /var/log/postgresql
+    env_file:
+      - .env
+volumes:
+  media:

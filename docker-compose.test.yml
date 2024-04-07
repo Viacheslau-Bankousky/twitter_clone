@@ -1,0 +1,28 @@
+version: '3'
+services:
+  test_nginx:
+    build:
+      context: .
+      dockerfile: ./tests/nginx_for_testing/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - test_fastapi
+  test_fastapi:
+    build:
+      context: .
+      dockerfile: ./tests/app_for_testing/Dockerfile
+    command: uvicorn tests.app_for_testing.application:test_app --host 0.0.0.0
+    expose:
+      - "8000"
+    environment:
+      - TESTING=true
+  tests:
+    build:
+      context: .
+      dockerfile: ./tests/Dockerfile
+    command: pytest -vv --tb=long /tests
+    depends_on:
+      - test_fastapi
+    environment:
+      - TESTING=true

@@ -92,6 +92,7 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+/out/
 
 # Pyre type checker
 .pyre/
@@ -109,3 +110,12 @@ dmypy.json
 
 # FastAPI
 *.log
+
+# Applications logs
+/logs/
+
+# Saved photos of tweets
+/saved_photos/
+
+# Docker volume
+/db_data/
